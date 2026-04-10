@@ -1,7 +1,7 @@
 import subprocess
 import tempfile
 from pathlib import Path
-from gsc.scanner import find_repos, get_repo_status, RepoStatus
+from gsc.scanner import find_repos, get_repo_status, RepoStatus, scan_all
 
 
 def _run_git(cwd, *args):
@@ -59,3 +59,17 @@ def test_get_repo_status_uncommitted():
 
         assert len(status.uncommitted_files) == 1
         assert status.is_clean is False
+
+
+def test_scan_all_returns_statuses_for_all_repos():
+    with tempfile.TemporaryDirectory() as tmp:
+        base = Path(tmp)
+        _init_repo(base / "alpha")
+        _init_repo(base / "beta")
+        (base / "not-a-repo").mkdir()
+
+        results = scan_all(base)
+
+        assert len(results) == 2
+        names = sorted(r.name for r in results)
+        assert names == ["alpha", "beta"]

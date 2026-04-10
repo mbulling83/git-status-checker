@@ -1,4 +1,5 @@
 import subprocess
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -72,3 +73,13 @@ def get_repo_status(repo_path: Path) -> RepoStatus:
             has_remote=False,
             error=str(e),
         )
+
+
+def scan_all(directory: Path) -> list[RepoStatus]:
+    """Scan all repos in directory in parallel, return sorted by name."""
+    repos = find_repos(directory)
+    if not repos:
+        return []
+    with ThreadPoolExecutor() as pool:
+        results = list(pool.map(get_repo_status, repos))
+    return sorted(results, key=lambda r: r.name.lower())
