@@ -22,22 +22,24 @@ gsc status             # non-interactive: just print the table and exit
 
 ## Core Flow
 
-1. **Scan** the target directory for all subdirectories containing a `.git` folder
+1. **Scan** the target directory for all direct child directories containing a `.git` folder (one level deep only)
 2. **Gather status** for each repo in parallel using `concurrent.futures.ThreadPoolExecutor`:
    - Uncommitted changes (staged + unstaged + untracked)
-   - Unpushed commits (ahead of remote)
-   - Current branch name
+   - Unpushed commits (ahead of remote tracking branch)
+   - Current branch name (or "detached HEAD" if in that state)
    - Whether on a non-default branch (not `main` or `master`)
+   - If a repo errors during scanning, capture the error and show it in the table rather than crashing
 3. **Display a summary table** (via `rich`) — one row per repo, color-coded:
    - Green: clean and pushed
    - Yellow: uncommitted changes
    - Red: unpushed commits
-   - Columns: repo name, branch, uncommitted file count, unpushed commit count, status indicator
+   - If both uncommitted and unpushed: red (worse state wins)
+   - Columns: repo name, branch, uncommitted file count, unpushed commit count
 4. **Interactive menu** (via `questionary`) — select a repo to drill into:
    - View diff (syntax-highlighted via `rich`)
-   - Stage all + commit (prompts for commit message)
+   - Stage all + commit (prompts for message)
    - Push
-   - Back to summary table
+   - Back to summary table (re-scans the selected repo to refresh its status)
 5. Clean repos hidden by default; shown with `--all` flag
 
 ## Architecture
