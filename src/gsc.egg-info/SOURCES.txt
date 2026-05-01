@@ -1,9 +1,14 @@
 pyproject.toml
 src/gsc/__init__.py
+src/gsc/actions.py
 src/gsc/cli.py
+src/gsc/display.py
+src/gsc/scanner.py
 src/gsc.egg-info/PKG-INFO
 src/gsc.egg-info/SOURCES.txt
 src/gsc.egg-info/dependency_links.txt
 src/gsc.egg-info/entry_points.txt
 src/gsc.egg-info/requires.txt
 src/gsc.egg-info/top_level.txt
+tests/test_display.py
+tests/test_scanner.py
